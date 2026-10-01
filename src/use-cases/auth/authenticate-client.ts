@@ -1,6 +1,5 @@
 import { ClientRepository } from '../../repositories/client-repository'
 
-import { ClientNotFoundError } from '../../errors/client-not-found-error'
 import { UnauthorizedError } from '../../errors/unauthorized-error'
 
 interface AuthenticateClientUseCaseRequest {
