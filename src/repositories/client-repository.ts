@@ -5,5 +5,5 @@ export interface ClientRepository {
   findByDocumentId(documentId: string): Promise<Client | null>
   findById(id: string): Promise<Client | null>
   findAll(): Promise<Client[]>
-  update(id: string, data: Prisma.ClientUpdateInput): Promise<Client>
+  save(data: Client): Promise<Client>
 }

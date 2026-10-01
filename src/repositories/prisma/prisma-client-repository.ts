@@ -38,10 +38,10 @@ export class PrismaClientRepository implements ClientRepository {
     return clients
   }
 
-  async update(id: string, data: Prisma.ClientUpdateInput): Promise<Client> {
+  async save(data: Client): Promise<Client> {
     const client = await prisma.client.update({
       where: {
-        id,
+        id: data.id,
       },
       data,
     })
