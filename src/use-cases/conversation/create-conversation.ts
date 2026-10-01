@@ -1,19 +1,17 @@
-import { ConversationRepository } from "../../repositories/conversation-repository";
+import { ConversationRepository } from '../../repositories/conversation-repository'
 
 interface CreateConversationUseCaseRequest {
-  clientId: string;
-  recipientId: string;
-  recipientName: string;
+  clientId: string
+  recipientId: string
+  recipientName: string
 }
 
 interface CreateConversationUseCaseResponse {
-  conversationId: string;
+  conversationId: string
 }
 
 export class CreateConversationUseCase {
-  constructor(
-    private conversationRepository: ConversationRepository,
-  ) { }
+  constructor(private conversationRepository: ConversationRepository) {}
 
   async execute({
     clientId,
@@ -24,12 +22,12 @@ export class CreateConversationUseCase {
       client: {
         connect: {
           id: clientId,
-        }
+        },
       },
       recipientId,
       recipientName,
-    });
+    })
 
-    return { conversationId: conversation.id };
+    return { conversationId: conversation.id }
   }
 }

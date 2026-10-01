@@ -1,27 +1,30 @@
-import { ConversationRepository } from "../../repositories/conversation-repository";
+import { ConversationRepository } from '../../repositories/conversation-repository'
 
 interface ListConversationsUseCaseRequest {
-  clientId: string;
+  clientId: string
 }
 
 interface ListConversationsUseCaseResponse {
   conversations: {
-    id: string;
-    recipientId: string;
-    clientId: string;
-    recipientName: string;
-    lastMessageAt: string | null;
-    lastMessageContent: string | null;
-    unreadCount: number;
-    createdAt: string;
-  }[];
+    id: string
+    recipientId: string
+    clientId: string
+    recipientName: string
+    lastMessageAt: string | null
+    lastMessageContent: string | null
+    unreadCount: number
+    createdAt: string
+  }[]
 }
 
 export class ListConversationsUseCase {
-  constructor(private conversationRepository: ConversationRepository) { }
+  constructor(private conversationRepository: ConversationRepository) {}
 
-  async execute({ clientId }: ListConversationsUseCaseRequest): Promise<ListConversationsUseCaseResponse> {
-    const conversations = await this.conversationRepository.findManyByClientId(clientId);
+  async execute({
+    clientId,
+  }: ListConversationsUseCaseRequest): Promise<ListConversationsUseCaseResponse> {
+    const conversations =
+      await this.conversationRepository.findManyByClientId(clientId)
 
     return {
       conversations: conversations.map(conversation => ({
@@ -34,6 +37,6 @@ export class ListConversationsUseCase {
         unreadCount: conversation.unreadCount,
         createdAt: conversation.createdAt.toISOString(),
       })),
-    };
+    }
   }
 }

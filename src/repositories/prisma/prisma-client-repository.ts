@@ -1,52 +1,51 @@
 import { Prisma, Client } from '../../../generated/prisma/client'
-import { prisma } from '../../libs/prisma';
+import { prisma } from '../../libs/prisma'
 
-
-import { ClientRepository } from "../client-repository";
+import { ClientRepository } from '../client-repository'
 
 export class PrismaClientRepository implements ClientRepository {
   async create(data: Prisma.ClientCreateInput): Promise<Client> {
     const client = await prisma.client.create({
-      data
-    });
+      data,
+    })
 
-    return client;
+    return client
   }
 
   async findByDocumentId(documentId: string): Promise<Client | null> {
     const client = await prisma.client.findUnique({
       where: {
-        documentId
-      }
-    });
+        documentId,
+      },
+    })
 
-    return client;
+    return client
   }
 
   async findById(id: string): Promise<Client | null> {
     const client = await prisma.client.findUnique({
       where: {
-        id
-      }
-    });
+        id,
+      },
+    })
 
-    return client;
+    return client
   }
 
   async findAll(): Promise<Client[]> {
-    const clients = await prisma.client.findMany();
+    const clients = await prisma.client.findMany()
 
-    return clients;
+    return clients
   }
 
   async update(id: string, data: Prisma.ClientUpdateInput): Promise<Client> {
     const client = await prisma.client.update({
       where: {
-        id
+        id,
       },
-      data
-    });
+      data,
+    })
 
-    return client;
+    return client
   }
 }

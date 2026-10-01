@@ -1,11 +1,11 @@
-import { z } from "zod";
+import { z } from 'zod'
 
-import { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
-import { makeListClientsUseCase } from "../../../use-cases/client/factories/make-list-clients";
-import { verifyAdmin } from "../../middlewares/verify-admin";
-import { errorResponse } from "../../../utils/schema/error-response";
+import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
+import { makeListClientsUseCase } from '../../../use-cases/client/factories/make-list-clients'
+import { verifyAdmin } from '../../middlewares/verify-admin'
+import { errorResponse } from '../../../utils/schema/error-response'
 
-export const listClientsRoute: FastifyPluginAsyncZod = async (app) => {
+export const listClientsRoute: FastifyPluginAsyncZod = async app => {
   app.get('/clients', {
     preHandler: [verifyAdmin],
     schema: {
@@ -24,18 +24,18 @@ export const listClientsRoute: FastifyPluginAsyncZod = async (app) => {
               limit: z.number(),
               planType: z.enum(['prepaid', 'postpaid']),
               active: z.boolean(),
-            })
-          )
+            }),
+          ),
         }),
         401: errorResponse.describe('Unauthorized'),
-      }
+      },
     },
     handler: async (request, reply) => {
       const listClientsUseCase = makeListClientsUseCase()
 
       const { clients } = await listClientsUseCase.execute()
 
-      return reply.send({ clients });
-    }
+      return reply.send({ clients })
+    },
   })
 }

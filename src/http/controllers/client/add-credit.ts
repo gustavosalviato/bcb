@@ -1,12 +1,12 @@
-import { z } from "zod";
+import { z } from 'zod'
 
-import { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
-import { validationErrorResponse } from "../../../utils/schema/validation-error-response";
-import { verifyAdmin } from "../../middlewares/verify-admin";
-import { makeAddCreditUseCase } from "../../../use-cases/client/factories/make-add-credit";
-import { errorResponse } from "../../../utils/schema/error-response";
+import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
+import { validationErrorResponse } from '../../../utils/schema/validation-error-response'
+import { verifyAdmin } from '../../middlewares/verify-admin'
+import { makeAddCreditUseCase } from '../../../use-cases/client/factories/make-add-credit'
+import { errorResponse } from '../../../utils/schema/error-response'
 
-export const addCreditRoute: FastifyPluginAsyncZod = async (app) => {
+export const addCreditRoute: FastifyPluginAsyncZod = async app => {
   app.post('/clients/:clientId/credits', {
     preHandler: [verifyAdmin],
     schema: {
@@ -24,11 +24,11 @@ export const addCreditRoute: FastifyPluginAsyncZod = async (app) => {
         404: errorResponse.describe('Client not found'),
         401: errorResponse.describe('Unauthorized'),
         400: validationErrorResponse,
-      }
+      },
     },
     handler: async (request, reply) => {
-      const { clientId } = request.params;
-      const { amount } = request.body;
+      const { clientId } = request.params
+      const { amount } = request.body
 
       const addCreditUseCase = makeAddCreditUseCase()
 
@@ -37,7 +37,7 @@ export const addCreditRoute: FastifyPluginAsyncZod = async (app) => {
         amount,
       })
 
-      return reply.status(204).send();
-    }
+      return reply.status(204).send()
+    },
   })
 }

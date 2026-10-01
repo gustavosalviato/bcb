@@ -1,24 +1,24 @@
-import { ClientRepository, } from "../../repositories/client-repository";
+import { ClientRepository } from '../../repositories/client-repository'
 
-import { ClientNotFoundError } from "../../errors/client-not-found-error";
+import { ClientNotFoundError } from '../../errors/client-not-found-error'
 
 interface DeleteClientUseCaseRequest {
-  clientId: string;
+  clientId: string
 }
 
 export class DeleteClientUseCase {
-  constructor(private clientRepository: ClientRepository) { }
+  constructor(private clientRepository: ClientRepository) {}
 
   async execute({ clientId }: DeleteClientUseCaseRequest): Promise<void> {
-    const client = await this.clientRepository.findById(clientId);
+    const client = await this.clientRepository.findById(clientId)
 
     if (!client) {
-      throw new ClientNotFoundError();
+      throw new ClientNotFoundError()
     }
 
     if (client.active) {
       await this.clientRepository.update(clientId, {
-        active: false
+        active: false,
       })
     }
   }

@@ -1,12 +1,12 @@
-import { z } from "zod";
+import { z } from 'zod'
 
-import { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
-import { authenticateClient } from "../../middlewares/authenticate-client";
-import { UnauthorizedError } from "../../../errors/unauthorized-error";
-import { makeGetConversationByIdUseCase } from "../../../use-cases/conversation/factories/make-get-conversation-by-id";
-import { errorResponse } from "../../../utils/schema/error-response";
+import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
+import { authenticateClient } from '../../middlewares/authenticate-client'
+import { UnauthorizedError } from '../../../errors/unauthorized-error'
+import { makeGetConversationByIdUseCase } from '../../../use-cases/conversation/factories/make-get-conversation-by-id'
+import { errorResponse } from '../../../utils/schema/error-response'
 
-export const getConversationByIdRoute: FastifyPluginAsyncZod = async (app) => {
+export const getConversationByIdRoute: FastifyPluginAsyncZod = async app => {
   app.get('/conversations/:conversationId', {
     preHandler: [authenticateClient],
     schema: {
@@ -31,19 +31,19 @@ export const getConversationByIdRoute: FastifyPluginAsyncZod = async (app) => {
         }),
         401: errorResponse.describe('Unauthorized'),
         404: errorResponse.describe('Conversation not found'),
-      }
+      },
     },
     handler: async (request, reply) => {
-      const { conversationId } = request.params;
+      const { conversationId } = request.params
 
-      const getConversationByIdUseCase = makeGetConversationByIdUseCase();
+      const getConversationByIdUseCase = makeGetConversationByIdUseCase()
 
       const { conversation } = await getConversationByIdUseCase.execute({
         clientId: request.client!.id,
         conversationId,
       })
 
-      return reply.status(200).send({ conversation });
-    }
+      return reply.status(200).send({ conversation })
+    },
   })
 }

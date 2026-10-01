@@ -1,18 +1,18 @@
-import { z } from "zod";
-import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
+import { z } from 'zod'
+import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
 
-import { makeListConversationMessagesUseCase } from "../../../use-cases/message/factories/make-list-conversation-messages";
-import { authenticateClient } from "../../middlewares/authenticate-client";
-import { errorResponse } from "../../../utils/schema/error-response";
-import { validationErrorResponse } from "../../../utils/schema/validation-error-response";
+import { makeListConversationMessagesUseCase } from '../../../use-cases/message/factories/make-list-conversation-messages'
+import { authenticateClient } from '../../middlewares/authenticate-client'
+import { errorResponse } from '../../../utils/schema/error-response'
+import { validationErrorResponse } from '../../../utils/schema/validation-error-response'
 
 export const listConversationMessagesRoute: FastifyPluginAsyncZod =
-  async (app) => {
-    app.get("/conversations/:conversationId/messages", {
+  async app => {
+    app.get('/conversations/:conversationId/messages', {
       preHandler: [authenticateClient],
       schema: {
-        summary: "List messages by conversation",
-        tags: ["messages"],
+        summary: 'List messages by conversation',
+        tags: ['messages'],
         params: z.object({
           conversationId: z.string(),
         }),
@@ -23,14 +23,14 @@ export const listConversationMessagesRoute: FastifyPluginAsyncZod =
                 id: z.string(),
                 conversationId: z.string(),
                 content: z.string(),
-                priority: z.enum(["normal", "urgent"]),
+                priority: z.enum(['normal', 'urgent']),
                 status: z.enum([
-                  "queued",
-                  "processing",
-                  "sent",
-                  "delivered",
-                  "read",
-                  "failed",
+                  'queued',
+                  'processing',
+                  'sent',
+                  'delivered',
+                  'read',
+                  'failed',
                 ]),
                 cost: z.number(),
                 createdAt: z.iso.datetime(),
@@ -47,18 +47,18 @@ export const listConversationMessagesRoute: FastifyPluginAsyncZod =
         },
       },
       handler: async (request, reply) => {
-        const { conversationId } = request.params;
+        const { conversationId } = request.params
 
-        const useCase = makeListConversationMessagesUseCase();
+        const useCase = makeListConversationMessagesUseCase()
 
         const { messages } = await useCase.execute({
           clientId: request.client!.id,
           conversationId,
-        });
+        })
 
         return reply.status(200).send({
-          messages
-        });
+          messages,
+        })
       },
-    });
-  };
+    })
+  }

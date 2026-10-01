@@ -1,7 +1,7 @@
-import { AppError } from "./app-error";
+import { AppError } from './app-error'
 
 export class MonthlyLimitExceedError extends AppError {
   constructor() {
-    super("Monthly limit exceeded", 409);
+    super('Monthly limit exceeded', 409)
   }
 }

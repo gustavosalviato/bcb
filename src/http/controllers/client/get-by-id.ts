@@ -1,12 +1,12 @@
-import { z } from "zod";
+import { z } from 'zod'
 
-import { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
-import { validationErrorResponse } from "../../../utils/schema/validation-error-response";
-import { makeGetClientByIdUseCase } from "../../../use-cases/client/factories/make-get-client-by-id";
-import { verifyAdmin } from "../../middlewares/verify-admin";
-import { errorResponse } from "../../../utils/schema/error-response";
+import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
+import { validationErrorResponse } from '../../../utils/schema/validation-error-response'
+import { makeGetClientByIdUseCase } from '../../../use-cases/client/factories/make-get-client-by-id'
+import { verifyAdmin } from '../../middlewares/verify-admin'
+import { errorResponse } from '../../../utils/schema/error-response'
 
-export const getClientByIdRoute: FastifyPluginAsyncZod = async (app) => {
+export const getClientByIdRoute: FastifyPluginAsyncZod = async app => {
   app.get('/clients/:clientId', {
     preHandler: [verifyAdmin],
     schema: {
@@ -30,10 +30,10 @@ export const getClientByIdRoute: FastifyPluginAsyncZod = async (app) => {
         404: errorResponse.describe('Client not found'),
         401: errorResponse.describe('Unauthorized'),
         400: validationErrorResponse,
-      }
+      },
     },
     handler: async (request, reply) => {
-      const { clientId } = request.params;
+      const { clientId } = request.params
 
       const getClientByIdUseCase = makeGetClientByIdUseCase()
 
@@ -41,7 +41,7 @@ export const getClientByIdRoute: FastifyPluginAsyncZod = async (app) => {
         clientId,
       })
 
-      return reply.send(client);
-    }
+      return reply.send(client)
+    },
   })
 }

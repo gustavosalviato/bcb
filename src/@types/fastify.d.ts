@@ -1,7 +1,7 @@
-import type { Client } from "../../generated/prisma/client";
+import type { Client } from '../../generated/prisma/client'
 
-declare module "fastify" {
+declare module 'fastify' {
   interface FastifyRequest {
-    client?: Client;
+    client?: Client
   }
 }

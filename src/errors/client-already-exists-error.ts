@@ -1,7 +1,7 @@
-import { AppError } from "./app-error";
+import { AppError } from './app-error'
 
 export class ClientAlreadyExistsError extends AppError {
   constructor() {
-    super("Client already exists", 409);
+    super('Client already exists', 409)
   }
 }

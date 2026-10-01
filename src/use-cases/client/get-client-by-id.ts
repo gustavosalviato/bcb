@@ -1,34 +1,35 @@
-import { ClientRepository, } from "../../repositories/client-repository";
+import { ClientRepository } from '../../repositories/client-repository'
 
-import { Client } from "../../../generated/prisma/client";
-import { ClientNotFoundError } from "../../errors/client-not-found-error";
+import { Client } from '../../../generated/prisma/client'
+import { ClientNotFoundError } from '../../errors/client-not-found-error'
 
 interface GetClientByIdUseCaseRequest {
-  clientId: string;
+  clientId: string
 }
 
 interface GetClientByIdUseCaseResponse {
   client: {
-    id: string;
-    name: string;
-    documentId: string;
-    documentType: Client['documentType'];
-    planType: Client['planType'];
-    balance: number;
-    limit: number;
-    active: boolean;
-
+    id: string
+    name: string
+    documentId: string
+    documentType: Client['documentType']
+    planType: Client['planType']
+    balance: number
+    limit: number
+    active: boolean
   }
 }
 
 export class GetClientByIdUseCase {
-  constructor(private clientRepository: ClientRepository) { }
+  constructor(private clientRepository: ClientRepository) {}
 
-  async execute({ clientId }: GetClientByIdUseCaseRequest): Promise<GetClientByIdUseCaseResponse> {
-    const client = await this.clientRepository.findById(clientId);
+  async execute({
+    clientId,
+  }: GetClientByIdUseCaseRequest): Promise<GetClientByIdUseCaseResponse> {
+    const client = await this.clientRepository.findById(clientId)
 
     if (!client) {
-      throw new ClientNotFoundError();
+      throw new ClientNotFoundError()
     }
 
     return {
@@ -36,7 +37,7 @@ export class GetClientByIdUseCase {
         ...client,
         balance: Number(client.balance),
         limit: Number(client.limit),
-      }
+      },
     }
   }
 }
