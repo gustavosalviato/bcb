@@ -5,7 +5,6 @@ import {
   ZodTypeProvider,
 } from "fastify-type-provider-zod";
 
-
 import { fastifySwagger } from "@fastify/swagger";
 import { fastifySwaggerUi } from "@fastify/swagger-ui";
 
@@ -24,6 +23,7 @@ import { listConversationsRoute } from "./http/controllers/conversation/list";
 import { getConversationByIdRoute } from "./http/controllers/conversation/get-by-id";
 import { sendMessageRoute } from "./http/controllers/message/send-message";
 import { listConversationMessagesRoute } from "./http/controllers/message/list-conversation-messages";
+import { getQueueStatusRoute } from "./http/controllers/message/get-queue-status";
 
 export const app = fastify().withTypeProvider<ZodTypeProvider>();
 
@@ -44,21 +44,21 @@ app.register(fastifySwaggerUi, {
   routePrefix: "/docs",
 });
 
-app.register(createClientRoute)
-app.register(getClientByIdRoute)
-app.register(listClientsRoute)
-app.register(updateClientRoute)
-app.register(deleteClientRoute)
-app.register(addCreditRoute)
-app.register(getBalanceRoute)
+app.register(createClientRoute);
+app.register(getClientByIdRoute);
+app.register(listClientsRoute);
+app.register(updateClientRoute);
+app.register(deleteClientRoute);
+app.register(addCreditRoute);
+app.register(getBalanceRoute);
 
-app.register(createConversationRoute)
-app.register(listConversationsRoute)
-app.register(getConversationByIdRoute)
+app.register(createConversationRoute);
+app.register(listConversationsRoute);
+app.register(getConversationByIdRoute);
 
-app.register(sendMessageRoute)
-app.register(listConversationMessagesRoute)
+app.register(sendMessageRoute);
+app.register(listConversationMessagesRoute);
 
-app.register(authenticateRoute)
+app.register(authenticateRoute);
 
-app.setErrorHandler(errorHandler)
+app.setErrorHandler(errorHandler);
