@@ -35,4 +35,19 @@ export class InMemoryConversationRepository implements ConversationRepository {
 
     return conversations
   }
+
+  async save(conversation: Conversation) {
+    const conversationIndex = this.items.findIndex(
+      item => item.id === conversation.id,
+    )
+
+    if (conversationIndex >= 0) {
+      this.items[conversationIndex] = conversation
+    }
+
+    return this.items[conversationIndex]
+  }
 }
+
+export const inMemoryConversationRepository =
+  new InMemoryConversationRepository()

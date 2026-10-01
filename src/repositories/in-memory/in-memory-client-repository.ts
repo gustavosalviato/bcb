@@ -48,3 +48,5 @@ export class InMemoryClientRepository implements ClientRepository {
     return client
   }
 }
+
+export const inMemoryClientRepository = new InMemoryClientRepository()
