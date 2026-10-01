@@ -17,7 +17,8 @@ export class UpdateClientUseCase {
       throw new ClientNotFoundError()
     }
 
-    await this.clientRepository.update(clientId, {
+    await this.clientRepository.save({
+      ...client,
       name: name ?? client.name,
     })
   }
