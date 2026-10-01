@@ -17,9 +17,9 @@ export class DeleteClientUseCase {
     }
 
     if (client.active) {
-      await this.clientRepository.update(clientId, {
-        active: false,
-      })
+      client.active = false
+
+      await this.clientRepository.save(client)
     }
   }
 }
