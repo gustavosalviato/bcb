@@ -17,11 +17,12 @@ export class AddCreditUseCase {
       throw new ClientNotFoundError()
     }
 
-    await this.clientRepository.update(
-      clientId,
-      client.planType === 'prepaid'
-        ? { balance: { increment: amount } }
-        : { limit: { increment: amount } },
-    )
+    await this.clientRepository.save({
+      ...client,
+      balance:
+        client.planType === 'prepaid'
+          ? client.balance.add(amount)
+          : client.limit.add(amount),
+    })
   }
 }
