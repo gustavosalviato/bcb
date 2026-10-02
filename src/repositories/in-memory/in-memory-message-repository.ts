@@ -16,8 +16,8 @@ import { inMemoryConversationRepository } from './in-memory-conversation-reposit
 import { inMemoryClientRepository } from './in-memory-client-repository'
 
 export class InMemoryMessageRepository implements MessageRepository {
-  private items: Message[] = []
-  private transactions: Transaction[] = []
+  public items: Message[] = []
+  public transactions: Transaction[] = []
 
   async createQueuedWithCharge(data: CreateQueuedMessageInput) {
     const cost = getMessageCost(data.priority)
@@ -137,5 +137,23 @@ export class InMemoryMessageRepository implements MessageRepository {
 
   async findManyByConversationId(conversationId: string) {
     return this.items.filter(item => item.conversationId === conversationId)
+  }
+
+  async create(data: Prisma.MessageCreateInput) {
+    const message: Message = {
+      id: data.id ?? randomUUID(),
+      conversationId: data.conversation.connect?.id ?? '',
+      content: data.content,
+      priority: data.priority ?? 'normal',
+      status: 'queued',
+      cost: new Prisma.Decimal(Number(data.cost)),
+      createdAt: new Date(),
+      sentAt: new Date() ?? null,
+      deliveredAt: null,
+      readAt: null,
+      failureReason: null,
+    }
+
+    return message
   }
 }
