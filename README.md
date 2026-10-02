@@ -4,10 +4,13 @@
 
 API de chat entre empresas e clientes finais, com cobrança por mensagem (pré-pago e pós-pago) e fila de processamento.
 
-**Perfil:** Backend  
-**Escopo desta entrega:** Parte 1 do desafio (fila FIFO em memória, processamento síncrono na mesma requisição).
+**Perfil:** Backend
+**Escopo:** Parte 1, com fila FIFO em memória e processamento dentro
+da requisição HTTP.
 
-A Parte 1 está **completa**. Identificação do cliente por header (`x-client-document-id`), os dois tipos de plano e o Swagger são **antecipação** de partes seguintes.
+A entrega implementa gerenciamento de clientes, conversas, envio simulado,
+validação financeira e histórico de mensagens. Também inclui identificação
+por header, suporte aos dois planos, documentação Swagger e teste unitários.
 
 ## Premissas
 
@@ -83,7 +86,7 @@ Content-Type: application/json
 
 {
   "name": "Empresa ABC",
-  "documentId": "12345678000199",
+  "documentId": "77777777777777",
   "documentType": "CNPJ",
   "planType": "prepaid"
 }
@@ -96,14 +99,14 @@ POST /auth
 Content-Type: application/json
 
 {
-  "documentId": "12345678000199"
+  "documentId": "77777777777777"
 }
 ```
 
 Nas rotas do cliente, envie o mesmo documento:
 
 ```http
-x-client-document-id: 12345678000199
+x-client-document-id: 77777777777777
 ```
 
 **Admin**
@@ -130,7 +133,9 @@ O header de admin **não** autentica o cliente, e o header de cliente **não** l
 
 6. **`POST /clients` público.** Cadastro exige só dados de registro (`documentId`, `planType`, `documentType`, etc.). Sem token ou header.
 
-7. **URL com id = admin; rota sem id = cliente.** `PUT /clients/profile` e `GET /clients/balance` valem só para o cliente do header. Rotas com `:clientId` na URL (consulta, créditos, inativação) são de admin.
+7. **Acesso aos clientes.** As consultas administrativas utilizam
+`/clients/:clientId`. As rotas `/clients/profile` e `/clients/balance`
+utilizam o cliente identificado pelo header. Conversas e mensagens são acessíveis apenas pelo cliente proprietário.
 
 8. **Fila FIFO em memória (`Map` com ponteiros).** Forma mais simples encontrada para enfileirar e processar na mesma requisição até `sent` ou `failed`.
 
@@ -147,6 +152,18 @@ O header de admin **não** autentica o cliente, e o header de cliente **não** l
 14. **Testes:** Testes unitários para os casos de uso.
 
 15. **Créditos e inativação só para admin.** `POST /clients/:clientId/credits` adiciona saldo (pré-pago) ou limite (pós-pago). O cliente não se credita. `DELETE /clients/:clientId` é **soft delete** (`active: false`), também restrito a admin.
+
+### Regras financeiras
+
+- Valores são armazenados em reais com `Decimal`
+- O custo é calculado no servidor: R$ 0,25 para mensagens normais
+  e R$ 0,50 para urgentes.
+- No pré-pago, o envio exige saldo suficiente e debita o custo.
+- No pós-pago, o limite contratado é comparado ao consumo de mensagens
+  do mês, considerando o horário de Brasília.
+- Aumentar o limite não quita nem zera o consumo mensal.
+- A cobrança e a criação da mensagem ocorrem na mesma transação.
+- Falhas no envio simulado não geram estorno automático.
 
 ## Funcionalidades implementadas
 
