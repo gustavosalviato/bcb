@@ -120,7 +120,7 @@ O header de admin **não** autentica o cliente, e o header de cliente **não** l
 
 1. **Fastify + TypeScript.** Stack do dia a dia. Familiaridade reduz o tempo de setup e deixa o foco no desafio da fila.
 
-2. **PostgreSQL + Prisma.** Conjunto já usado em projetos de estudo. Atende a preferência do teste por banco real, mesmo sem ser o stack do emprego atual.
+2. **PostgreSQL + Prisma.** Conjunto já usado em projetos de estudo.
 
 3. **Camadas HTTP / caso de uso / repositório.** Estrutura simples, com papel claro: HTTP, regra de negócio e persistência.
 
