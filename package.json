@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsup src/server.ts",
+    "db:seed": "prisma db seed --config prisma7.config.ts",
+    "build": "tsup src",
     "test": "vitest run",
     "test:watch": "vitest"
   },
