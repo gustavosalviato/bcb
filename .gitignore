@@ -7,6 +7,6 @@ dist
 ## Environment
 .env
 
-
-## Prisma Generated
-generated
+/openspec
+.cursor
+/docs
