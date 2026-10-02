@@ -197,4 +197,18 @@ export class PrismaMessageRepository implements MessageRepository {
       },
     })
   }
+
+  findByIdAndClientId(
+    messageId: string,
+    clientId: string,
+  ): Promise<Message | null> {
+    return prisma.message.findFirst({
+      where: {
+        id: messageId,
+        conversation: {
+          clientId,
+        },
+      },
+    })
+  }
 }

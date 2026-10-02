@@ -23,6 +23,7 @@ import { listConversationsRoute } from './http/controllers/conversation/list'
 import { getConversationByIdRoute } from './http/controllers/conversation/get-by-id'
 import { sendMessageRoute } from './http/controllers/message/send-message'
 import { listConversationMessagesRoute } from './http/controllers/message/list-conversation-messages'
+import { getMessageRoute } from './http/controllers/message/get-message'
 
 export const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -57,6 +58,7 @@ app.register(getConversationByIdRoute)
 
 app.register(sendMessageRoute)
 app.register(listConversationMessagesRoute)
+app.register(getMessageRoute)
 
 app.register(authenticateRoute)
 
