@@ -27,7 +27,7 @@ A Parte 1 está **completa**. Identificação do cliente por header (`x-client-d
 
 ## Como executar
 
-Requisitos: Node.js 20+, npm, Docker e Docker Compose.
+Requisitos: Node.js (20.19+, 22.12+, 24.0+), npm, e Docker
 
 O Compose sobe só o Postgres. A API roda na máquina, com `npm run dev`. Executar os comandos abaixo em ordem:
 
@@ -55,7 +55,7 @@ Variáveis em `.env.example`: `PORT`, `DATABASE_URL`, `ADMIN_API_KEY`. A chave d
 
 O Prisma usa o arquivo `prisma7.config.ts`. Sem `--config`, o CLI não encontra a URL do banco.
 
-Testes (in-memory, não precisam do Postgres):
+Testes unitários (in-memory):
 
 ```bash
 npm run test
@@ -134,9 +134,9 @@ O header de admin **não** autentica o cliente, e o header de cliente **não** l
 
 8. **Fila FIFO em memória (`Map` com ponteiros).** Forma mais simples encontrada para enfileirar e processar na mesma requisição até `sent` ou `failed`.
 
-9. **Cadeia de `Promise`.** Serializa o processamento no processo (uma mensagem por vez). Mesma justificativa: simplicidade.
+9. **Cadeia de `Promise`.** Serializa o processamento no processo (uma mensagem por vez).
 
-10. **Sender simulado.** O teste aceita simular o envio. Integrar SMS/WhatsApp sairia do prazo.
+10. **Sender simulado.** O teste aceita simular o envio.
 
 11. **Cobrança em transação Prisma `Serializable`.** Débito ou consumo de limite, criação da mensagem e registro financeiro entram juntos: commit se tudo der certo; exceção se alguma ação falhar, sem persistir o conjunto.
 
@@ -144,7 +144,7 @@ O header de admin **não** autentica o cliente, e o header de cliente **não** l
 
 13. **Swagger em `/docs`.** Documentar os endpoints para o avaliador.
 
-14. **Testes automatizados.** Fora desta entrega; entram depois.
+14. **Testes:** Testes unitários para os casos de uso.
 
 15. **Créditos e inativação só para admin.** `POST /clients/:clientId/credits` adiciona saldo (pré-pago) ou limite (pós-pago). O cliente não se credita. `DELETE /clients/:clientId` é **soft delete** (`active: false`), também restrito a admin.
 
@@ -168,15 +168,15 @@ Extras:
 
 Contratos de request/response: Swagger em `/docs`.
 
-## Trabalho futuro
+## Melhorias futuras
 
 **Parte 2**
 
 - Fila com dois níveis (urgente primeiro) e proteção contra starvation
-- Status `delivered` e `read` no fluxo (os valores já existem no enum do Prisma)
-- Autenticação mais completa (token/JWT), se fizer sentido
+- Status `delivered` e `read` no fluxo
+- Autenticação mais completa (token/JWT)
 - Conversão de plano e listagem de histórico financeiro
-- Consulta de pós-pago com consumo do mês (hoje o balance devolve o limite, não o restante)
+- Consulta de pós-pago com consumo do mês
 
 **Parte 3**
 
