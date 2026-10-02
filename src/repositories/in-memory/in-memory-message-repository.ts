@@ -156,4 +156,8 @@ export class InMemoryMessageRepository implements MessageRepository {
 
     return message
   }
+
+  async findById(messageId: string): Promise<Message | null> {
+    return this.items.find(item => item.id === messageId) ?? null
+  }
 }
