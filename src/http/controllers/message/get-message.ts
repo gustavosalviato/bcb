@@ -7,12 +7,13 @@ import { validationErrorResponse } from '../../../utils/schema/validation-error-
 import { makeGetMessageUseCase } from '../../../use-cases/message/factories/make-get-message'
 
 export const getMessageRoute: FastifyPluginAsyncZod = async app => {
-  app.get('/messages/:messageId', {
+  app.get('/conversations/:conversationId/messages/:messageId', {
     preHandler: [authenticateClient],
     schema: {
       summary: 'Get message by id',
       tags: ['messages'],
       params: z.object({
+        conversationId: z.string(),
         messageId: z.string(),
       }),
       response: {
@@ -44,12 +45,13 @@ export const getMessageRoute: FastifyPluginAsyncZod = async app => {
       },
     },
     handler: async (request, reply) => {
-      const { messageId } = request.params
+      const { messageId, conversationId } = request.params
 
       const useCase = makeGetMessageUseCase()
 
       const { message } = await useCase.execute({
         clientId: request.client!.id,
+        conversationId,
         messageId,
       })
 

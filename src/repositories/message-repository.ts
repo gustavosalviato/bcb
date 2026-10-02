@@ -13,8 +13,5 @@ export interface MessageRepository {
   markAsSent(messageId: string): Promise<void>
   markAsFailed(messageId: string, failureReason: string): Promise<void>
   findManyByConversationId(conversationId: string): Promise<Message[]>
-  findByIdAndClientId(
-    messageId: string,
-    clientId: string,
-  ): Promise<Message | null>
+  findById(messageId: string): Promise<Message | null>
 }

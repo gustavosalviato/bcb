@@ -1,9 +1,12 @@
 import type { MessageRepository } from '../../repositories/message-repository'
 import { MessagePriority, MessageStatus } from '../../../generated/prisma/enums'
 import { MessageNotFoundError } from '../../errors/message-not-found-error'
+import { ConversationRepository } from '../../repositories/conversation-repository'
+import { ConversationNotFoundError } from '../../errors/conversation-not-found-error'
 
 interface GetMessageUseCaseRequest {
   clientId: string
+  conversationId: string
   messageId: string
 }
 
@@ -24,16 +27,26 @@ interface GetMessageUseCaseResponse {
 }
 
 export class GetMessageUseCase {
-  constructor(private messageRepository: MessageRepository) {}
+  constructor(
+    private messageRepository: MessageRepository,
+    private conversationRepository: ConversationRepository,
+  ) {}
 
   async execute({
     clientId,
     messageId,
+    conversationId,
   }: GetMessageUseCaseRequest): Promise<GetMessageUseCaseResponse> {
-    const response = await this.messageRepository.findByIdAndClientId(
-      messageId,
+    const conversation = await this.conversationRepository.findByIdAndClientId(
+      conversationId,
       clientId,
     )
+
+    if (!conversation) {
+      throw new ConversationNotFoundError()
+    }
+
+    const response = await this.messageRepository.findById(messageId)
 
     if (!response) {
       throw new MessageNotFoundError()
