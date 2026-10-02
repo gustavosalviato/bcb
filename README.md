@@ -7,13 +7,11 @@ API de chat entre empresas e clientes finais, com cobrança por mensagem (pré-p
 **Perfil:** Backend  
 **Escopo desta entrega:** Parte 1 do desafio (fila FIFO em memória, processamento síncrono na mesma requisição).
 
-A Parte 1 está **completa**. Identificação do cliente por header (`x-client-document-id`), os dois tipos de plano e o Swagger são **antecipação** de partes seguintes. Priorização na fila, worker assíncrono e endpoints extras do briefing ficam como trabalho futuro.
-
-O briefing original do teste permanece em [`docs/`](./docs/). Este README é o documento de entrega.
+A Parte 1 está **completa**. Identificação do cliente por header (`x-client-document-id`), os dois tipos de plano e o Swagger são **antecipação** de partes seguintes.
 
 ## Premissas
 
-- Autenticação só identifica o cliente. Não há senha nem JWT. O `POST /auth` devolve dados do cliente; as próximas requisições reenviam o documento no header.
+- Autenticação só identifica o cliente. Não há senha nem JWT. O `POST /auth` devolve dados do cliente; as próximas requisições precisam receber o documento no header para identificação do cliente.
 - `POST /clients` é público: cadastro não exige token nem header de admin.
 - O envio de mensagem é **simulado** (log no servidor). Não há integração real com SMS ou WhatsApp.
 - A fila vive em memória no processo da API. Reiniciar o container esvazia a fila.
@@ -31,7 +29,7 @@ O briefing original do teste permanece em [`docs/`](./docs/). Este README é o d
 
 Requisitos: Node.js 20+, npm, Docker e Docker Compose.
 
-O Compose sobe só o Postgres. A API roda na máquina, com `npm run dev`.
+O Compose sobe só o Postgres. A API roda na máquina, com `npm run dev`. Executar os comandos abaixo em ordem:
 
 ```bash
 git clone https://github.com/gustavosalviato/bcb.git
@@ -40,10 +38,11 @@ cp .env.example .env
 npm i
 docker compose up -d
 npx prisma migrate dev --config prisma7.config.ts
+npm run db:seed
 npm run dev
 ```
 
-Ordem importa: o banco precisa estar no ar antes do `prisma migrate dev`.
+`npm run db:seed` grava clientes, conversas e mensagens de exemplo. Rodar de novo apaga e recria só esses documentos, sem mexer em outros cadastros.
 
 Serviços:
 
@@ -59,8 +58,20 @@ O Prisma usa o arquivo `prisma7.config.ts`. Sem `--config`, o CLI não encontra 
 Testes (in-memory, não precisam do Postgres):
 
 ```bash
-npm test
+npm run test
 ```
+
+## Dados de exemplo
+
+Depois do seed, estes documentos já existem:
+
+| Cliente | Documento | Plano | O que tem |
+| --- | --- | --- | --- |
+| Empresa ABC | `12345678000199` | pré-pago | saldo R$ 1,25, duas conversas, mensagens `sent` e `failed` |
+| Loja Norte | `98765432000188` | pós-pago | limite R$ 2,75, uma conversa, mensagens `sent` |
+| Cliente Inativo | `12345678909` | pré-pago | `active: false`, sem conversas |
+
+Header do cliente de exemplo: `x-client-document-id: 12345678000199`.
 
 ## Como autenticar
 
@@ -113,7 +124,7 @@ O header de admin **não** autentica o cliente, e o header de cliente **não** l
 
 3. **Camadas HTTP / caso de uso / repositório.** Estrutura simples, com papel claro: HTTP, regra de negócio e persistência.
 
-4. **Auth mínima.** `POST /auth` identifica o cliente por CPF/CNPJ. Sem senha e sem JWT de propósito, para não gastar tempo num sistema de autenticação completo e concentrar na fila.
+4. **Auth mínima.** `POST /auth` identifica o cliente por CPF/CNPJ.
 
 5. **Dois headers.** `x-admin-key` só em recursos de admin. Cliente autenticado usa `x-client-document-id`. Escopos separados de propósito.
 
@@ -129,25 +140,23 @@ O header de admin **não** autentica o cliente, e o header de cliente **não** l
 
 11. **Cobrança em transação Prisma `Serializable`.** Débito ou consumo de limite, criação da mensagem e registro financeiro entram juntos: commit se tudo der certo; exceção se alguma ação falhar, sem persistir o conjunto.
 
-12. **Prioridade só no custo.** `normal` custa R$ 0,25 e `urgent` R$ 0,50, mas a fila não reordena. Filas separadas por prioridade ficam como melhoria (Parte 2).
+12. **Prioridade só no custo.** `normal` custa R$ 0,25 e `urgent` R$ 0,50, mas a fila não reordena.
 
 13. **Swagger em `/docs`.** Documentar os endpoints para o avaliador.
 
-14. **Docker Compose com `api` + `db`.** Subir o projeto sem montar Node e Postgres na máquina.
+14. **Testes automatizados.** Fora desta entrega; entram depois.
 
-15. **Testes automatizados.** Fora desta entrega; entram depois.
-
-16. **Créditos e inativação só para admin.** `POST /clients/:clientId/credits` adiciona saldo (pré-pago) ou limite (pós-pago). O cliente não se credita. `DELETE /clients/:clientId` é **soft delete** (`active: false`), também restrito a admin.
+15. **Créditos e inativação só para admin.** `POST /clients/:clientId/credits` adiciona saldo (pré-pago) ou limite (pós-pago). O cliente não se credita. `DELETE /clients/:clientId` é **soft delete** (`active: false`), também restrito a admin.
 
 ## Funcionalidades implementadas
 
-Alinhado às entregas mínimas da Parte 1 (auth e clientes, fila em memória, validação financeira, histórico de conversas, envio e processamento):
+Alinhado às entregas mínimas da Parte 1 (auth e clientes, fila em memória, validação financeira, histórico de conversas, envio e processamento e recebimento):
 
 - `POST /auth` — identifica o cliente pelo documento
 - CRUD de clientes: `POST /clients` (público), `GET /clients` e `GET /clients/:clientId` (admin), `PUT /clients/profile` (cliente)
 - `GET /clients/balance` — saldo (pré-pago) ou limite (pós-pago) do cliente autenticado
 - Conversas: `POST /conversations`, `GET /conversations`, `GET /conversations/:conversationId`
-- Mensagens: `POST /messages` (valida plano, cobra, enfileira e processa na mesma request), `GET /conversations/:conversationId/messages`
+- Mensagens: `POST /messages` (valida plano, cobra, enfileira e processa na mesma request), `GET /conversations/:conversationId/messages`, `GET /conversations/:conversationId/messages/:messageId`
 - Fila FIFO em memória e status `queued` → `processing` → `sent` ou `failed`
 - Planos **pré-pago** e **pós-pago**
 
@@ -166,24 +175,11 @@ Contratos de request/response: Swagger em `/docs`.
 - Fila com dois níveis (urgente primeiro) e proteção contra starvation
 - Status `delivered` e `read` no fluxo (os valores já existem no enum do Prisma)
 - Autenticação mais completa (token/JWT), se fizer sentido
+- Conversão de plano e listagem de histórico financeiro
+- Consulta de pós-pago com consumo do mês (hoje o balance devolve o limite, não o restante)
 
 **Parte 3**
 
 - Worker assíncrono fora da requisição HTTP
 - `GET /queue/status` e métricas da fila
 - Cache, retry e simulação de tempo real
-
-**Outros itens do briefing / regras, fora desta Parte 1**
-
-- `GET /messages`, `GET /messages/:id`, `GET /messages/:id/status`
-- Tipo da mensagem (SMS / WhatsApp)
-- Conversão de plano e listagem de histórico financeiro
-- Testes automatizados
-- Consulta de pós-pago com consumo do mês (hoje o balance devolve o limite, não o restante)
-
-## Limitações
-
-- A fila em memória some no restart. O FAQ do teste não exige persistir a fila.
-- `POST /auth` não devolve token. O cliente reenvia o documento no header `x-client-document-id`.
-- `POST /messages` responde `sent` ou `failed`. O processamento é síncrono na mesma request (Parte 1). O exemplo do briefing com `queued` e `estimatedDelivery` descreve outro estágio do desafio.
-- `GET /clients/balance` no pós-pago devolve o limite mensal, não o valor já consumido no mês.
