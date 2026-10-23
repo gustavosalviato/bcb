@@ -148,7 +148,7 @@ export class InMemoryMessageRepository implements MessageRepository {
       status: 'queued',
       cost: new Prisma.Decimal(Number(data.cost)),
       createdAt: new Date(),
-      sentAt: new Date() ?? null,
+      sentAt: data.sentAt ? new Date(data.sentAt) : null,
       deliveredAt: null,
       readAt: null,
       failureReason: null,

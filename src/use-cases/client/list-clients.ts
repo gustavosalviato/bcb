@@ -1,5 +1,5 @@
 import { ClientRepository } from '../../repositories/client-repository'
-1
+
 import { Client } from '../../../generated/prisma/client'
 interface ListClientsUseCaseResponse {
   clients: {
@@ -15,7 +15,7 @@ interface ListClientsUseCaseResponse {
 }
 
 export class ListClientsUseCase {
-  constructor(private clientRepository: ClientRepository) {}
+  constructor(private clientRepository: ClientRepository) { }
 
   async execute(): Promise<ListClientsUseCaseResponse> {
     const clients = await this.clientRepository.findAll()
